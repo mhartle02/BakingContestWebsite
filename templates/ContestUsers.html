@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contest Users</title>
+</head>
+<body>
+    <h>Contest Users</h>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Phone Number</th>
+                <th>Security Level</th>
+                <th>Login Password</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in USER%}
+            <tr>
+                <td>{{ user[0]}}</td>
+                <td>{{ user[1]}}</td>
+                <td>{{ user[2]}}</td>
+                <td>{{ user[3]}}</td>
+                <td>{{ user[4]}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
