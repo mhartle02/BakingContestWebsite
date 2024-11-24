@@ -5,7 +5,10 @@
     <title>AddRec</title>
 </head>
 <body>
-    <p>Query Result:</p>
+    <p>Query Result:
+        {% for error in errors %}
+        {{error}}</p>
+        {% endfor %}
     <a href="/">back to home</a><br><br>
 </body>
 </html>

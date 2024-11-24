@@ -1,32 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <style>
+        table, th, td {
+        border: 1px solid black;
+        }
+    </style>
     <title>Contest Users</title>
 </head>
 <body>
-    <h>Contest Users</h>
+    <h1>Contest Users</h1>
     <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Phone Number</th>
-                <th>Security Level</th>
-                <th>Login Password</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in USER%}
-            <tr>
-                <td>{{ user[0]}}</td>
-                <td>{{ user[1]}}</td>
-                <td>{{ user[2]}}</td>
-                <td>{{ user[3]}}</td>
-                <td>{{ user[4]}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Phone Number</th>
+            <th>Security Level</th>
+            <th>Login Password</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            <td>{{ user[3] }}</td>
+            <td>{{ user[4] }}</td>
+        </tr>
+        {% endfor %}
     </table>
+    <a href="/">Go back to home page</a><br><br>
 </body>
 </html>
