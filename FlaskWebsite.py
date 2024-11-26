@@ -1,58 +1,57 @@
 import sqlite3
 from flask import Flask, render_template, request
 
-#create a new db
-conn = sqlite3.connect('../BakingContest.db')
+app = Flask(__name__)
 
-#create cursor to exectute queries
+
+conn = sqlite3.connect('../BakingContest.db')
 cur = conn.cursor()
 
-#Create USER table
-try:
-    cur.execute("CREATE TABLE USER"
-                "(User_Id Integer PRIMARY KEY NOT NULL,"
-                "Name String NOT NULL,"
-                " Age Integer NOT NULL,"
-                " Phone_Number String NOT NULL,"
-                " Security_Level String NOT NULL,"
-                " Login_Password String NOT NULL);")
+cur.executescript("CREATE TABLE IF NOT EXISTS USER"
+                "(User_Id INTEGER PRIMARY KEY NOT NULL,"
+                "Name TEXT NOT NULL,"
+                "Age INTEGER NOT NULL,"
+                "Phone_Number TEXT NOT NULL,"
+                "Security_Level TEXT NOT NULL,"
+                "Login_Password TEXT NOT NULL);"
+                "CREATE TABLE IF NOT EXISTS ENTRIES"
+                "(Entry_Id INTEGER PRIMARY KEY NOT NULL,"
+                "User_Id INTEGER NOT NULL,"
+                "Item_Name TEXT NOT NULL,"
+                "Excellent_Votes INTEGER NOT NULL,"
+                "Ok_Votes INTEGER NOT NULL,"
+                "Bad_Votes INTEGER NOT NULL);")
 
-    print("User table created.")
 
-except Exception as e:
-    print(e)
+conn.commit()
+conn.close()
 
-#Create ENTRIES table
-try:
-    cur.execute("CREATE TABLE ENTRIES"
-                "(Entry_Id Integer PRIMARY KEY NOT NULL,"
-                "User_Id Integer NOT NULL,"
-                "Item_Name String NOT NULL,"
-                "Excellent_Votes Integer NOT NULL,"
-                "Ok_Votes Integer NOT NULL,"
-                "Bad_Votes Integer NOT NULL);")
-except Exception as e:
-    print(e)
 
-app = Flask(__name__)
+
+
 @app.route('/')
 def home_page():
     return render_template('HomePage.html')
+
 
 @app.route('/enternew')
 def enter_new():
     return render_template('EnterNew.html')
 
+
 @app.route('/contestResults')
 def contest_results():
     conn = sqlite3.connect('../BakingContest.db')
     cur = conn.cursor()
-    cur.execute("SELECT Entry_Id, User_Id, Item_Name, "
-                "Excellent_Votes, Ok_Votes, Bad_Votes "
-                "FROM ENTRIES")
+    cur.execute("SELECT Entry_Id, User_Id, Item_Name, Excellent_Votes, Ok_Votes, Bad_Votes FROM ENTRIES")
     results = cur.fetchall()
     conn.close()
+
+    # Debugging: Print results to console to verify
+    print("Contest Results: ", results)
+
     return render_template('ContestResults.html', results=results)
+
 
 @app.route('/contestUsers')
 def contest_users():
@@ -63,6 +62,7 @@ def contest_users():
     conn.close()
     return render_template('ContestUsers.html', users=users)
 
+
 @app.route('/addrec', methods=['POST'])
 def add_rec():
     name = request.form['Name']
@@ -70,14 +70,13 @@ def add_rec():
     phone_number = request.form['PhoneNumber']
     security_level = request.form['SecurityLevel']
     login_password = request.form['Password']
-    fields = [name, age, phone_number, security_level, login_password]
     error_message = []
 
     # Input validation
     if not name or name.isspace():
         error_message.append('You cannot enter an empty name.')
-    if age.isdigit() and 0 < int(age) < 121:
-        error_message.append('Age must be a whole number greater than 0 and less than 121.')
+    if not age.isdigit() or not (0 < int(age) <= 120):
+        error_message.append('Age must be a whole number greater than 0 and less than or equal to 120.')
     if not phone_number or phone_number.isspace():
         error_message.append('You cannot enter an empty phone number.')
     if not security_level or security_level.isspace():
@@ -98,6 +97,7 @@ def add_rec():
         print(error)
 
     return render_template('AddRec.html', errors=error_message)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
