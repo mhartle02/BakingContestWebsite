@@ -1,8 +1,10 @@
 import sqlite3
-from flask import Flask, render_template, request, redirect
+from optparse import Values
+
+from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
-
+app.secret_key = 'key'
 
 conn = sqlite3.connect('../BakingContest.db', check_same_thread=False)
 cur = conn.cursor()
@@ -31,7 +33,9 @@ conn.close()
 
 @app.route('/')
 def home_page():
-    return render_template('HomePage.html')
+    name = session.get('name', 'Guest')  # Default to 'Guest' if not set
+    security_level = session.get('Security_Level', 1)  # Default to 1 if not set
+    return render_template('HomePage.html', name=name, Security_Level=security_level)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,6 +62,8 @@ def login():
 
                 if user:  # If a matching user is found
                     name, security_level = user
+                    session['name'] = name
+                    session['Security_Level'] = security_level
                     return render_template(
                         'HomePage.html', name=name, Security_Level=security_level
                     )
@@ -84,6 +90,8 @@ def enter_new():
 def contest_results():
     conn = sqlite3.connect('../BakingContest.db')
     cur = conn.cursor()
+    name = session.get('name', 'Guest')  # Default to 'Guest' if not set
+    security_level = session.get('Security_Level', 1)  # Default to 1 if not set
     cur.execute("SELECT Entry_Id, User_Id, Item_Name, Excellent_Votes, Ok_Votes, Bad_Votes FROM ENTRIES")
     results = cur.fetchall()
     conn.close()
@@ -93,11 +101,39 @@ def contest_results():
 
     return render_template('ContestResults.html', results=results)
 
+@app.route('/myContestResults')
+def my_contest_results():
+    conn = sqlite3.connect('../BakingContest.db')
+    cur = conn.cursor()
+
+    # Retrieve session variables
+    name = session.get('name', 'Guest')
+    security_level = session.get('Security_Level', 1)
+
+    # Execute the query with the correct parameters
+    cur.execute("""
+        SELECT e.Entry_Id, e.Item_Name, e.Excellent_Votes, e.Ok_Votes, e.Bad_Votes
+        FROM ENTRIES AS e
+        JOIN USER AS u ON u.User_Id = e.User_Id
+        WHERE u.Name = ?
+    """, (name,))
+
+    # Fetch all results from the query
+    results = cur.fetchall()
+
+    # Close the connection
+    conn.close()
+
+    # Return the results to the template
+    return render_template('MyContestResults.html', results=results)
+
 
 @app.route('/contestUsers')
 def contest_users():
     conn = sqlite3.connect('../BakingContest.db')
     cur = conn.cursor()
+    name = session.get('name', 'Guest')  # Default to 'Guest' if not set
+    security_level = session.get('Security_Level', 1)  # Default to 1 if not set
     cur.execute('SELECT Name, Age, Phone_Number, Security_Level, Login_Password FROM USER')
     users = cur.fetchall()
     conn.close()
