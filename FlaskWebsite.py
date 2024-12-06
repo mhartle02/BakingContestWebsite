@@ -34,6 +34,20 @@ def home_page():
     return render_template('HomePage.html')
 
 
+@app.route('/login')
+def login():
+    error_message = ''
+    name = request.form['name']
+    password = request.form['password']
+
+    user = cur.execute("SELECT * FROM USER WHERE User_Id = ? AND Login_Password = ?", (name, password)).fetchone()
+
+    if not user:
+        error_message = "Invalid username and/or password!"
+
+    return render_template('Login.html', error=error_message)
+
+
 @app.route('/enternew')
 def enter_new():
     return render_template('EnterNew.html')
