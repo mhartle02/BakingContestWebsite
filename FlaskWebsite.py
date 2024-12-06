@@ -1,10 +1,10 @@
 import sqlite3
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
 
-conn = sqlite3.connect('../BakingContest.db')
+conn = sqlite3.connect('../BakingContest.db', check_same_thread=False)
 cur = conn.cursor()
 
 cur.executescript("CREATE TABLE IF NOT EXISTS USER"
@@ -34,18 +34,45 @@ def home_page():
     return render_template('HomePage.html')
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     error_message = ''
-    name = request.form['name']
-    password = request.form['password']
+    if request.method == 'POST':
+        name = request.form.get('name')
+        password = request.form.get('password')
 
-    user = cur.execute("SELECT * FROM USER WHERE User_Id = ? AND Login_Password = ?", (name, password)).fetchone()
+        # Validate the user input
+        if not name or not password:
+            error_message = "Please provide both username and password!"
+        else:
+            try:
+                # Connect to the database
+                conn = sqlite3.connect('../BakingContest.db')
+                cur = conn.cursor()
 
-    if not user:
-        error_message = "Invalid username and/or password!"
+                # Query the database
+                user = cur.execute(
+                    "SELECT Name, Security_Level FROM USER WHERE Name = ? AND Login_Password = ?",
+                    (name, password)
+                ).fetchone()
 
+                if user:  # If a matching user is found
+                    name, security_level = user
+                    return render_template(
+                        'HomePage.html', name=name, Security_Level=security_level
+                    )
+                else:
+                    error_message = "Invalid username and/or password!"
+            except Exception as e:
+                # Log the error for debugging
+                print(f"Database error: {e}")
+                error_message = "An unexpected error occurred. Please try again later."
+            finally:
+                conn.close()  # Ensure the connection is always closed
+
+    # Render the login page with an error message (if any)
     return render_template('Login.html', error=error_message)
+
 
 
 @app.route('/enternew')
