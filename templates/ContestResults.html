@@ -10,27 +10,36 @@
     </style>
 </head>
 <body>
-    <h1>Contest Results</h1>
-    <table>
-        <tr>
-            <th>Entry Id</th>
-            <th>User Id</th>
-            <th>Name of Baking Item</th>
-            <th>Number of Excellent Votes</th>
-            <th>Number of Ok Votes</th>
-            <th>Number of Bad Votes</th>
-        </tr>
-        {% for result in results %}
-        <tr>
-            <td>{{ result[0] }}</td>
-            <td>{{ result[1] }}</td>
-            <td>{{ result[2] }}</td>
-            <td>{{ result[3] }}</td>
-            <td>{{ result[4] }}</td>
-            <td>{{ result[5] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="/">Go back to home page</a><br><br>
+
+    {% if Security_Level == 3 %}
+        <h1>Contest Results</h1>
+        <table>
+            <tr>
+                <th>Entry Id</th>
+                <th>User Id</th>
+                <th>Name of Baking Item</th>
+                <th>Number of Excellent Votes</th>
+                <th>Number of Ok Votes</th>
+                <th>Number of Bad Votes</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                <td>{{ result[0] }}</td>
+                <td>{{ result[1] }}</td>
+                <td>{{ result[2] }}</td>
+                <td>{{ result[3] }}</td>
+                <td>{{ result[4] }}</td>
+                <td>{{ result[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="/">Go back to home page</a><br><br>
+        <a href="/logout">Logout</a>
+    {% endif %}
+    {% if Security_Level != 3 %}
+        <h1>Not Found</h1>
+        <p>the requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+    {% endif %}
+
 </body>
 </html>

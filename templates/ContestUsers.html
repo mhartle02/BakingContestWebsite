@@ -9,25 +9,31 @@
     <title>Contest Users</title>
 </head>
 <body>
-    <h1>Contest Users</h1>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Phone Number</th>
-            <th>Security Level</th>
-            <th>Login Password</th>
-        </tr>
-        {% for user in users %}
-        <tr>
-            <td>{{ user[0] }}</td>
-            <td>{{ user[1] }}</td>
-            <td>{{ user[2] }}</td>
-            <td>{{ user[3] }}</td>
-            <td>{{ user[4] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="/">Go back to home page</a><br><br>
+    {% if Security_Level >= 2 %}
+        <h1>Contest Users</h1>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Phone Number</th>
+                <th>Security Level</th>
+                <th>Login Password</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="/">Go back to home page</a><br><br>
+    {% endif %}
+    {% if Security_Level < 2 %}
+        <h1>Not Found</h1>
+        <p>the requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+    {% endif %}
 </body>
 </html>
